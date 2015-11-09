@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.jpgm.Constants;
+
 public class BayesianNetwork {
 
 	private Map<String, Node> nodes;
@@ -38,7 +40,7 @@ public class BayesianNetwork {
 		boolean done = false;
 		for(String nodeName : nodes.keySet()){
 			Node node = nodes.get(nodeName);
-			if(node.getDistribution().length < node.getParameters().size()){
+			if(node.getDistribution() == null || node.getDistribution().length < node.getParameters().size()){
 				node.setDefaultDistribution();
 				done = true;
 			}
@@ -48,10 +50,10 @@ public class BayesianNetwork {
 		String line;
 		try {
 			line = reader.readLine();
-			List<String> headers = Arrays.asList(line.split(","));
+			List<String> headers = Arrays.asList(line.split(Constants.DELIMITER));
 			while((line = reader.readLine()) != null){
 				for(Node node : nodes.values()){
-					String[] vals = line.split(",");
+					String[] vals = line.split(Constants.DELIMITER);
 					node.countOccurances(headers, vals);
 				}
 			}
@@ -67,10 +69,10 @@ public class BayesianNetwork {
 		PrintWriter writer = getWriter(tempPath);
 		try {
 			String line = reader.readLine();
-			List<String> headers = Arrays.asList(line.split(","));
+			List<String> headers = Arrays.asList(line.split(Constants.DELIMITER));
 			writer.write(line);
 			while((line = reader.readLine()) != null){
-				String[] vals = line.split(",");
+				String[] vals = line.split(Constants.DELIMITER);
 				for(Node node : nodes.values()){
 					if(node.getParents() == null){
 						node.mostLikelyValue(headers, vals);
@@ -108,6 +110,11 @@ public class BayesianNetwork {
 		dataPath = path;
 		File file = new File(dataPath);
 		tempPath = file.getParent().toString() + File.separator + "temp.txt";
+	}
+	
+	public void printDetails(){
+		for(Node node : nodes.values())
+			System.out.println(node);
 	}
 
 }

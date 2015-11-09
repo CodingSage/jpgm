@@ -3,6 +3,8 @@ package edu.jpgm.models;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.jpgm.Constants;
+
 
 public class Node {
 
@@ -36,7 +38,7 @@ public class Node {
 			distribution = new double[totalrows][parameters.size()];
 		for (int i = 0; i < totalrows; i++) {
 			for (int j = 0; j < parameters.size(); j++) 
-				distribution[i][j] = 1 / parameters.size();
+				distribution[i][j] = 1.0 / parameters.size();
 		}
 	}
 
@@ -75,15 +77,17 @@ public class Node {
 	public void mostLikelyValue(List<String> headers, String[] values){
 		int totalrows = distribution.length;
 		int a = headers.indexOf(name);
-		if(values[a].isEmpty()){
+		if(values[a].equals(Constants.MISSING_VALUE)){
 			int index = 0;
-			for(int i = 0; i < parents.length; i++){
-				int a1 = headers.indexOf(parents[i].getName());
-				int b1 = parents[i].getParameters().indexOf(values[a1]);
-				if(values[a1].isEmpty())
-					return;
-				else
-					index += b1*totalrows/parents[i].getParameters().size();
+			if(parents != null){
+				for(int i = 0; i < parents.length; i++){
+					int a1 = headers.indexOf(parents[i].getName());
+					int b1 = parents[i].getParameters().indexOf(values[a1]);
+					if(values[a1].equals(Constants.MISSING_VALUE))
+						return;
+					else
+						index += b1*totalrows/parents[i].getParameters().size();
+				}
 			}
 			double[] row = distribution[index];
 			double max = 0;
@@ -96,8 +100,9 @@ public class Node {
 			}
 			values[a] = parameters.get(maxi);
 		}
-		for(Node node : children)
-			node.mostLikelyValue(headers, values);
+		if(children != null)
+			for(Node node : children)
+				node.mostLikelyValue(headers, values);
 	}
 
 	public List<String> getParameters() {
@@ -132,6 +137,9 @@ public class Node {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		str.append(name + "\n");
+		for(String param : parameters)
+			str.append(param + "\t");
+		str.append("\n--------------\n");
 		for(int i = 0; i < distribution.length; i++){
 			double[] vals = distribution[i];
 			for(int j = 0; j < vals.length; j++)

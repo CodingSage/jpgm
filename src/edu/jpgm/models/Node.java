@@ -16,6 +16,8 @@ public class Node {
 	private List<String> parameters;
 	private int[] occurances;
 
+	//Node name, All possible values in the order as the distribution table should be constructed,
+	//parents in the order of the distribution table
 	public Node(String name, String[] params, Node[] parents) {
 		this.name = name;
 		this.parents = parents;
@@ -29,6 +31,7 @@ public class Node {
 		occurances = new int[totalrows];
 	}
 
+	//Assigns uniform distribution
 	public void setDefaultDistribution() {
 		int totalrows = 1;
 		if (parents != null)

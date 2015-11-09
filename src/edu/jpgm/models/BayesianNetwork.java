@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import edu.jpgm.Constants;
 
@@ -40,7 +41,7 @@ public class BayesianNetwork {
 		boolean done = false;
 		for(String nodeName : nodes.keySet()){
 			Node node = nodes.get(nodeName);
-			if(node.getDistribution() == null || node.getDistribution().length < node.getParameters().size()){
+			if(node.getDistribution() == null){
 				node.setDefaultDistribution();
 				done = true;
 			}
@@ -65,20 +66,23 @@ public class BayesianNetwork {
 	}
 
 	private void mStep() {
-		BufferedReader reader = getReader(dataPath);
-		PrintWriter writer = getWriter(tempPath);
 		try {
+			BufferedReader reader = getReader(dataPath);
+			PrintWriter writer = getWriter(tempPath);
 			String line = reader.readLine();
 			List<String> headers = Arrays.asList(line.split(Constants.DELIMITER));
-			writer.write(line);
+			writer.write(line+"\n");
 			while((line = reader.readLine()) != null){
 				String[] vals = line.split(Constants.DELIMITER);
-				for(Node node : nodes.values()){
-					if(node.getParents() == null){
-						node.mostLikelyValue(headers, vals);
-					}
-				}
+				for(Node node : nodes.values())
+					node.mostLikelyValue(headers, vals);
+				StringJoiner str = new StringJoiner(",");
+				for(String val : vals)
+					str.add(val);
+				writer.write(str.toString()+"\n");
 			}
+			reader.close();
+			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

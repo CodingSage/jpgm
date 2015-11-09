@@ -13,7 +13,7 @@ public class Main {
 		BayesianNetwork net = new BayesianNetwork(createGraph2());
 		//training data path
 		net.setDataPath("/home/vinayak/Projects/jpgm/resources/sprinkler_test.dat");
-		net.iterate();
+		net.iterate(2);
 		net.printDetails();
 	}
 	

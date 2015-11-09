@@ -45,11 +45,12 @@ public class Node {
 	public void countOccurances(List<String> headers, String[] vals) {
 		int index = 0;
 		int totalrows = occurances.length;
-		for(int i = 0; i < parents.length; i++){
+		for(int i = 0; parents != null && i < parents.length; i++){
 			Node node = parents[i];
 			int a = headers.indexOf(node.getName());
 			int b = node.getParameters().indexOf(vals[a]);
-			index += b*totalrows/node.getParameters().size();
+			totalrows /= node.getParameters().size();
+			index += b*totalrows;
 		}
 		int a = headers.indexOf(name);
 		int b = parameters.indexOf(vals[a]);
@@ -85,8 +86,10 @@ public class Node {
 					int b1 = parents[i].getParameters().indexOf(values[a1]);
 					if(values[a1].equals(Constants.MISSING_VALUE))
 						return;
-					else
-						index += b1*totalrows/parents[i].getParameters().size();
+					else {
+						totalrows /= parents[i].getParameters().size();
+						index += b1*totalrows;
+					}
 				}
 			}
 			double[] row = distribution[index];
@@ -136,7 +139,11 @@ public class Node {
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		str.append(name + "\n");
+		str.append(name + " :");
+		if(parents != null)
+			for(Node node : parents)
+				str.append(" " + node.getName());
+		str.append("\n");
 		for(String param : parameters)
 			str.append(param + "\t");
 		str.append("\n--------------\n");
